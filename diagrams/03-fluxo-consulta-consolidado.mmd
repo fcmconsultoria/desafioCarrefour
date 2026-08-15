@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant C as Cliente
+    participant GW as API Gateway
+    participant CS as Consolidation Service
+    participant R as Redis
+    participant DB as PostgreSQL
+    
+    C->>GW: GET /consolidado/{data}
+    GW->>CS: GET /consolidado/{data}
+    CS->>R: GET cache:{data}
+    
+    alt Cache Hit
+        R-->>CS: Dados do consolidado
+        CS-->>GW: 200 OK
+        GW-->>C: 200 OK
+    else Cache Miss
+        CS->>DB: SELECT consolidado WHERE data = ?
+        DB-->>CS: Dados do consolidado
+        CS->>R: SET cache:{data} (TTL 5min)
+        CS-->>GW: 200 OK
+        GW-->>C: 200 OK
+    end

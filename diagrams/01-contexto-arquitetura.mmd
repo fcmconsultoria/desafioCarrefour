@@ -1,0 +1,62 @@
+graph TB
+    subgraph "External Systems"
+        Client[Cliente API]
+    end
+    
+    subgraph "API Gateway"
+        Gateway[API Gateway]
+    end
+    
+    subgraph "Financial Ledger Service"
+        API1[REST API]
+        DB1[(PostgreSQL)]
+        Publisher[Event Publisher]
+    end
+    
+    subgraph "Message Broker"
+        Queue[RabbitMQ<br/>Message Queue]
+        DLQ[Dead Letter Queue]
+    end
+    
+    subgraph "Daily Consolidation Service"
+        Consumer[Event Consumer]
+        Worker[Consolidation Worker]
+        API2[REST API]
+        DB2[(PostgreSQL)]
+        Cache[(Redis Cache)]
+    end
+    
+    subgraph "Monitoring"
+        Metrics[Prometheus]
+        Dash[Grafana Dashboard]
+    end
+    
+    Client -->|HTTPS| Gateway
+    Gateway -->|Route| API1
+    Gateway -->|Route| API2
+    
+    API1 -->|Persist| DB1
+    API1 -->|Publish Event| Queue
+    Queue -->|Consume| Consumer
+    Queue -.->|Failed Messages| DLQ
+    
+    Consumer --> Worker
+    Worker -->|Process| DB2
+    Worker -->|Update| Cache
+    
+    API2 -->|Read| Cache
+    API2 -.->|Cache Miss| DB2
+    
+    API1 -.->|Metrics| Metrics
+    API2 -.->|Metrics| Metrics
+    Queue -.->|Metrics| Metrics
+    Metrics --> Dash
+    
+    style Client fill:#e1f5ff
+    style Gateway fill:#fff4e1
+    style API1 fill:#e8f5e9
+    style API2 fill:#e8f5e9
+    style Queue fill:#f3e5f5
+    style Cache fill:#fff9c4
+    style DB1 fill:#fce4ec
+    style DB2 fill:#fce4ec

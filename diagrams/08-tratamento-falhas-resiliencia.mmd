@@ -1,0 +1,23 @@
+graph TB
+    subgraph "Cenário: Consolidation Service Down"
+        LS[Ledger Service]
+        MQ[RabbitMQ]
+        CS_down[Consolidation Service ❌]
+        MQ_full[Queue Building Up]
+        CS_up[Consolidation Service ✅]
+        DLQ[Dead Letter Queue]
+    end
+    
+    LS -->|Publish| MQ
+    MQ -.->|Consume| CS_down
+    MQ -->|Messages Queued| MQ_full
+    
+    Note over MQ_full: Messages persistem<br/>não são perdidos
+    
+    CS_up -->|Resume Consuming| MQ
+    MQ -->|Process Backlog| CS_up
+    
+    MQ -.->|Max Retries| DLQ
+    
+    style CS_down fill:#ffcdd2
+    style CS_up fill:#c8e6c9

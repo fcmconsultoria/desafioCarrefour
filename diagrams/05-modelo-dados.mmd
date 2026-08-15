@@ -1,0 +1,29 @@
+erDiagram
+    LANCAMENTOS ||--o{ LANCAMENTOS : "registra"
+    
+    LANCAMENTOS {
+        uuid id PK
+        decimal valor "valor positivo"
+        string tipo "debito|credito"
+        datetime data_hora
+        string descricao
+        datetime created_at
+        datetime updated_at
+    }
+    
+    CONSOLIDADO_DIARIO {
+        date data PK
+        decimal total_creditos
+        decimal total_debitos
+        decimal saldo_final
+        integer qtd_lancamentos
+        datetime updated_at
+    }
+    
+    IDEMPOTENCY_KEYS {
+        string key PK
+        uuid lancamento_id FK
+        json response
+        datetime created_at
+        datetime expires_at
+    }

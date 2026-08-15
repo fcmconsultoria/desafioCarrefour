@@ -1,0 +1,49 @@
+graph LR
+    subgraph "Ledger Service"
+        subgraph "API Layer"
+            Controller[LancamentoController]
+            Validator[RequestValidator]
+        end
+        
+        subgraph "Service Layer"
+            LedgerService[LedgerService]
+            IdempotencyService[IdempotencyService]
+        end
+        
+        subgraph "Infrastructure Layer"
+            Repository[LancamentoRepository]
+            EventPublisher[RabbitMQPublisher]
+        end
+        
+        Controller --> Validator
+        Controller --> LedgerService
+        LedgerService --> IdempotencyService
+        LedgerService --> Repository
+        LedgerService --> EventPublisher
+    end
+    
+    subgraph "Consolidation Service"
+        subgraph "API Layer"
+            ConsolidadoController[ConsolidadoController]
+        end
+        
+        subgraph "Service Layer"
+            ConsolidadoService[ConsolidadoService]
+            CacheService[CacheService]
+        end
+        
+        subgraph "Worker Layer"
+            EventConsumer[RabbitMQConsumer]
+            ConsolidationWorker[ConsolidationWorker]
+        end
+        
+        subgraph "Infrastructure Layer"
+            ConsolidadoRepository[ConsolidadoRepository]
+        end
+        
+        ConsolidadoController --> ConsolidadoService
+        ConsolidadoService --> CacheService
+        ConsolidadoService --> ConsolidadoRepository
+        EventConsumer --> ConsolidationWorker
+        ConsolidationWorker --> ConsolidadoService
+    end

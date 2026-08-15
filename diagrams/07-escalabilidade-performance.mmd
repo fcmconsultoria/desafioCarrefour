@@ -1,0 +1,40 @@
+graph LR
+    subgraph "Pico de Carga (50 req/s)"
+        Load["50 req/s"]
+    end
+    
+    subgraph "Camada 1: API Gateway"
+        GW1[Rate Limiting]
+        GW2[Load Balancing]
+    end
+    
+    subgraph "Camada 2: Ledger Service"
+        LS1[Scale out<br/>3 instâncias]
+        LS2[~17 req/s cada]
+    end
+    
+    subgraph "Camada 3: Message Queue"
+        MQ1[Buffer<br/>RabbitMQ]
+        MQ2[Spikes absorvidos]
+    end
+    
+    subgraph "Camada 4: Consolidation Service"
+        CS1[Scale out<br/>2 instâncias]
+        CS2[~25 req/s cada]
+    end
+    
+    subgraph "Camada 5: Cache"
+        R1[Redis]
+        R2[Cache hit<br/>~90%]
+    end
+    
+    Load --> GW1
+    GW1 --> GW2
+    GW2 --> LS1
+    LS1 --> LS2
+    LS2 --> MQ1
+    MQ1 --> MQ2
+    MQ2 --> CS1
+    CS1 --> CS2
+    CS2 --> R1
+    R1 --> R2

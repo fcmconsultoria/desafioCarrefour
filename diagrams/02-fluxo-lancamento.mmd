@@ -1,0 +1,33 @@
+sequenceDiagram
+    participant C as Cliente
+    participant GW as API Gateway
+    participant LS as Ledger Service
+    participant DB as PostgreSQL
+    participant MQ as RabbitMQ
+    participant CS as Consolidation Service
+    participant R as Redis
+    
+    C->>GW: POST /lancamentos (com idempotency-key)
+    GW->>LS: POST /lancamentos
+    LS->>LS: Verifica idempotency-key
+    alt Key já existe
+        LS-->>GW: 200 OK (resultado cacheado)
+        GW-->>C: 200 OK
+    else Key não existe
+        LS->>DB: INSERT lancamento
+        DB-->>LS: Sucesso
+        LS->>MQ: Publish "LancamentoCriado"
+        MQ-->>LS: Ack
+        LS->>LS: Cacheia resultado
+        LS-->>GW: 201 Created
+        GW-->>C: 201 Created
+    end
+    
+    Note over MQ,CS: Processamento Assíncrono
+    
+    MQ->>CS: Consume "LancamentoCriado"
+    CS->>CS: Processa consolidação
+    CS->>DB: Atualiza consolidado
+    DB-->>CS: Sucesso
+    CS->>R: Invalida cache do dia
+    CS->>MQ: Ack

@@ -1,0 +1,67 @@
+graph TB
+    subgraph "Production Environment"
+        subgraph "Load Balancer"
+            LB[Load Balancer / API Gateway]
+        end
+        
+        subgraph "Ledger Service Cluster"
+            LS1[Ledger Service Pod 1]
+            LS2[Ledger Service Pod 2]
+            LS3[Ledger Service Pod 3]
+        end
+        
+        subgraph "Consolidation Service Cluster"
+            CS1[Consolidation Service Pod 1]
+            CS2[Consolidation Service Pod 2]
+        end
+        
+        subgraph "Data Layer"
+            PG_primary[(PostgreSQL Primary)]
+            PG_replica[(PostgreSQL Replica)]
+            R_master[(Redis Master)]
+            R_replica[(Redis Replica)]
+        end
+        
+        subgraph "Message Layer"
+            RMQ1[RabbitMQ Node 1]
+            RMQ2[RabbitMQ Node 2]
+            RMQ3[RabbitMQ Node 3]
+        end
+        
+        subgraph "Monitoring"
+            PROM[Prometheus]
+            GRAF[Grafana]
+        end
+        
+        LB --> LS1
+        LB --> LS2
+        LB --> LS3
+        LB --> CS1
+        LB --> CS2
+        
+        LS1 --> PG_primary
+        LS2 --> PG_primary
+        LS3 --> PG_primary
+        CS1 --> PG_replica
+        CS2 --> PG_replica
+        
+        LS1 --> RMQ1
+        LS2 --> RMQ2
+        LS3 --> RMQ3
+        CS1 --> RMQ1
+        CS2 --> RMQ2
+        
+        CS1 --> R_master
+        CS2 --> R_master
+        
+        LS1 -.-> PROM
+        LS2 -.-> PROM
+        LS3 -.-> PROM
+        CS1 -.-> PROM
+        CS2 -.-> PROM
+        RMQ1 -.-> PROM
+        RMQ2 -.-> PROM
+        RMQ3 -.-> PROM
+        
+        PROM --> GRAF
+    end
