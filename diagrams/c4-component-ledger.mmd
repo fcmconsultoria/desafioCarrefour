@@ -1,0 +1,37 @@
+graph TB
+    subgraph "Ledger Service (Container)"
+        subgraph "API Layer"
+            LancamentosController["LancamentosController<br/>(REST API)"]
+        end
+
+        subgraph "Service Layer"
+            LancamentoService["LancamentoService<br/>(Business Logic)"]
+        end
+
+        subgraph "Data Layer"
+            LancamentoRepository["LancamentoRepository<br/>(Data Access)"]
+            IdempotencyRepository["IdempotencyRepository<br/>(Idempotency Keys)"]
+        end
+
+        subgraph "Messaging Layer"
+            RabbitMQEventPublisher["RabbitMQEventPublisher<br/>(Event Publisher)"]
+        end
+
+        subgraph "External"
+            LedgerDB["PostgreSQL<br/>(ledgerdb)"]
+            RabbitMQ["RabbitMQ<br/>(lancamentos queue)"]
+        end
+    end
+
+    LancamentosController -->|usa| LancamentoService
+    LancamentoService -->|usa| LancamentoRepository
+    LancamentoService -->|usa| IdempotencyRepository
+    LancamentoService -->|usa| RabbitMQEventPublisher
+    LancamentoRepository -->|SQL| LedgerDB
+    RabbitMQEventPublisher -->|Publish| RabbitMQ
+
+    style LancamentosController fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style LancamentoService fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style LancamentoRepository fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style IdempotencyRepository fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style RabbitMQEventPublisher fill:#fff3e0,stroke:#e65100,stroke-width:2px

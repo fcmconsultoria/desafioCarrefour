@@ -1,0 +1,39 @@
+graph TB
+    subgraph "Sistema de Fluxo de Caixa Diário"
+        subgraph "Cliente"
+            ClienteWeb["Cliente Web<br/>(Swagger UI)"]
+        end
+
+        subgraph "Aplicações"
+            LedgerService["Ledger Service<br/>(API de Lançamentos)"]
+            ConsolidationService["Consolidation Service<br/>(API de Consolidado)"]
+        end
+
+        subgraph "Mensageria"
+            RabbitMQ["RabbitMQ<br/>(Message Broker)"]
+        end
+
+        subgraph "Cache"
+            Redis["Redis<br/>(Cache)"]
+        end
+
+        subgraph "Bancos de Dados"
+            LedgerDB["PostgreSQL<br/>(ledgerdb)"]
+            ConsolidationDB["PostgreSQL<br/>(consolidationdb)"]
+        end
+    end
+
+    ClienteWeb -->|HTTP: localhost:5001| LedgerService
+    ClienteWeb -->|HTTP: localhost:5002| ConsolidationService
+    LedgerService -->|Publish| RabbitMQ
+    RabbitMQ -->|Consume| ConsolidationService
+    LedgerService -->|SQL| LedgerDB
+    ConsolidationService -->|SQL| ConsolidationDB
+    ConsolidationService -->|Cache| Redis
+
+    style LedgerService fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style ConsolidationService fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style RabbitMQ fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style Redis fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style LedgerDB fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style ConsolidationDB fill:#f3e5f5,stroke:#4a148c,stroke-width:2px

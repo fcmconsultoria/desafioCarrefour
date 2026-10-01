@@ -1,0 +1,39 @@
+graph TB
+    subgraph "Consolidation Service (Container)"
+        subgraph "API Layer"
+            ConsolidadoController["ConsolidadoController<br/>(REST API)"]
+        end
+
+        subgraph "Service Layer"
+            ConsolidationService["ConsolidationService<br/>(Business Logic)"]
+            RedisCacheService["RedisCacheService<br/>(Cache Logic)"]
+        end
+
+        subgraph "Data Layer"
+            ConsolidadoRepository["ConsolidadoRepository<br/>(Data Access)"]
+        end
+
+        subgraph "Messaging Layer"
+            RabbitMQEventConsumer["RabbitMQEventConsumer<br/>(Event Consumer)"]
+        end
+
+        subgraph "External"
+            ConsolidationDB["PostgreSQL<br/>(consolidationdb)"]
+            RabbitMQ["RabbitMQ<br/>(lancamentos queue)"]
+            Redis["Redis<br/>(cache)"]
+        end
+    end
+
+    ConsolidadoController -->|usa| ConsolidationService
+    ConsolidationService -->|usa| RedisCacheService
+    ConsolidationService -->|usa| ConsolidadoRepository
+    RabbitMQEventConsumer -->|Consume| RabbitMQ
+    RabbitMQEventConsumer -->|processa| ConsolidationService
+    RedisCacheService -->|Cache| Redis
+    ConsolidadoRepository -->|SQL| ConsolidationDB
+
+    style ConsolidadoController fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style ConsolidationService fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style RedisCacheService fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style ConsolidadoRepository fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style RabbitMQEventConsumer fill:#fff3e0,stroke:#e65100,stroke-width:2px

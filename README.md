@@ -327,7 +327,26 @@ Documentação detalhada disponível em `/passoapasso/`:
 
 ---
 
-## 💰 Estimativa de Custos (AWS)
+## � Diagramas C4 (Modelo C4)
+
+Diagramas arquiteturais seguindo o modelo C4 (Context, Containers, Components):
+
+- [Context Diagram](diagrams/c4-context.mmd) - Sistema e seu contexto (atores externos, sistemas externos)
+- [Container Diagram](diagrams/c4-container.mmd) - Containers (aplicações, bancos, filas) e suas relações
+- [Component Diagram - Ledger Service](diagrams/c4-component-ledger.mmd) - Componentes dentro do Ledger Service
+- [Component Diagram - Consolidation Service](diagrams/c4-component-consolidation.mmd) - Componentes dentro do Consolidation Service
+
+### Como Visualizar
+
+Use [Mermaid Live Editor](https://mermaid.live) para visualizar os diagramas:
+1. Abra o arquivo `.mmd`
+2. Copie o código
+3. Cole no Mermaid Live Editor
+4. O diagrama será renderizado automaticamente
+
+---
+
+## �💰 Estimativa de Custos (AWS)
 
 Custo mensal estimado para produção: **$138 - $183 USD**
 
@@ -434,6 +453,7 @@ Este projeto foi desenvolvido para fins de demonstração em processo seletivo.
 ## 📖 Documentação Completa
 
 Documentação detalhada disponível em:
+- [GUIA_ESTUDO_ENTREVISTA.md](GUIA_ESTUDO_ENTREVISTA.md) - Guia completo para estudo e entrevista
 - [GUIA_FINAL.md](GUIA_FINAL.md) - Guia completo para submissão
 - [RESUMO_IMPLEMENTACAO.md](RESUMO_IMPLEMENTACAO.md) - Resumo técnico
 - [passoapasso/](passoapasso/) - Documentação de processo de elaboração
